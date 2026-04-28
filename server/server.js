@@ -8,8 +8,10 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+
 app.use(cors({
-  origin: ["https://kicks-collection.vercel.app/", "http://localhost:5173"],
+  // REMOVED the "/" from the end of the vercel link
+  origin: ["https://kicks-collection.vercel.app", "http://localhost:5173"],
   credentials: true
 }));
 // Use the routes
