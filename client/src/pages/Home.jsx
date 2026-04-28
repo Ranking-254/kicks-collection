@@ -4,6 +4,9 @@ import Hero from '../components/Hero';
 import SearchBar from '../components/SearchBar';
 import ProductCard from '../components/ProductCard';
 
+// This pulls the URL from Vercel/Local .env
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +14,8 @@ const Home = () => {
   const fetchProducts = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/products?search=${searchQuery}`);
+      // Updated the template literal to use API_URL
+      const response = await axios.get(`${API_URL}/api/products?search=${searchQuery}`);
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products", error);
@@ -25,17 +29,14 @@ const Home = () => {
 
   return (
     <div className="pb-20">
-      {/* 1. Hero Section for Hot Picks */}
       <Hero />
 
       <div className="container mx-auto px-4">
-        {/* 2. Search Bar for specific discovery */}
         <div className="mb-12">
           <h3 className="text-center text-xl font-bold mb-4 uppercase tracking-widest">Find your style</h3>
           <SearchBar onSearch={fetchProducts} />
         </div>
 
-        {/* 3. Main Product Grid */}
         <h2 className="text-2xl font-black mb-6 uppercase">Full Collection</h2>
         {loading ? (
           <div className="flex justify-center items-center h-40">
