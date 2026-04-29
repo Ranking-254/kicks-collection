@@ -7,7 +7,7 @@ const {
     addProduct, 
     addReview, 
     handleReviewStatus 
-} = require('../controllers/productController');
+} = require('../controllers/ProductController');
 
 // Standard Routes
 router.get('/', getProducts);

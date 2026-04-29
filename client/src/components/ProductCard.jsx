@@ -8,6 +8,11 @@ const ProductCard = ({ product }) => {
   const currentPrice = Number(product.price);
   const savedAmount = (originalPrice > currentPrice) ? originalPrice - currentPrice : 0;
 
+  // 🛠️ THE FIX: Check for the first image in the array, fallback to single image, then placeholder
+  const displayImage = (product.imageUrls && product.imageUrls.length > 0) 
+    ? product.imageUrls[0] 
+    : (product.imageUrl || 'https://via.placeholder.com/400x400?text=No+Image');
+
   return (
     <>
       <div 
@@ -22,7 +27,12 @@ const ProductCard = ({ product }) => {
         )}
 
         <div className="relative h-64 overflow-hidden">
-          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+          {/* ⚡ UPDATED src HERE ⚡ */}
+          <img 
+            src={displayImage} 
+            alt={product.name} 
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+          />
         </div>
 
         <div className="p-5 flex flex-col flex-grow">
