@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Logo from './Logo'; // Import the new component
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,12 +9,11 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white border-b sticky top-0 z-[100] shadow-sm">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         
-        {/* LOGO */}
-        <Link to="/" className="text-2xl font-black tracking-tighter text-black uppercase italic">
-          KICKS<span className="text-yellow-400">COLLECTION</span>
-        </Link>
+        {/* LOGO COMPONENT - Height adjusted for the navbar */}
+        {/* Change these values to make it bigger on your screen */}
+<Logo className="h-16 md:h-18" variant="light" />
 
         {/* DESKTOP LINKS (Hidden on Mobile) */}
         <div className="hidden md:flex space-x-8 font-black uppercase text-xs tracking-widest">
@@ -21,7 +21,7 @@ const Navbar = () => {
           <Link to="/category/clothes" className="hover:text-yellow-500 transition-colors">Clothes</Link>
         </div>
 
-        {/* MOBILE HAMBURGER BUTTON (Hidden on Desktop) */}
+        {/* MOBILE HAMBURGER BUTTON */}
         <button 
           onClick={toggleMenu}
           className="md:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1.5 focus:outline-none"
@@ -49,7 +49,6 @@ const Navbar = () => {
           >
             Clothes
           </Link>
-         
         </div>
       </div>
     </nav>
