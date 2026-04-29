@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import CategoryPage from './pages/CategoryPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
+import Footer from './components/Footer';
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -35,6 +36,7 @@ function App() {
         {/* Optional: keeps the login accessible directly if needed */}
         <Route path="/admin/login" element={<AdminLogin setAuth={setIsAdmin} />} />
       </Routes>
+      <Footer />
     </div>
   );
 }
