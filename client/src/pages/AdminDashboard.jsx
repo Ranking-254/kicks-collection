@@ -11,11 +11,12 @@ const AdminDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // NEW: Loading state for submit
   const [sizeInput, setSizeInput] = useState("");
 
   const [formData, setFormData] = useState({
     name: '', description: '', price: '', originalPrice: '', 
-    category: 'shoes', imageUrls: [], isHotPick: false, size: [] // Changed imageUrl to imageUrls array
+    category: 'shoes', imageUrls: [], isHotPick: false, size: [] 
   });
 
   useEffect(() => { fetchProducts(); }, []);
@@ -52,7 +53,6 @@ const AdminDashboard = () => {
     setFormData({ ...formData, size: formData.size.filter(s => s !== sizeToRemove) });
   };
 
-  // UPDATED: Handle Multiple Image Uploads
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -91,6 +91,8 @@ const AdminDashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.imageUrls.length === 0) return alert("Upload at least one image!");
+    
+    setIsSaving(true); // Start Loading
     try {
       if (editingId) {
         await axios.put(`${API_URL}/api/products/${editingId}`, formData);
@@ -101,7 +103,11 @@ const AdminDashboard = () => {
       resetForm();
       fetchProducts();
       alert("Inventory Updated!");
-    } catch (err) { alert("Error saving product"); }
+    } catch (err) { 
+      alert("Error saving product"); 
+    } finally {
+      setIsSaving(false); // Stop Loading regardless of outcome
+    }
   };
 
   const resetForm = () => {
@@ -112,7 +118,7 @@ const AdminDashboard = () => {
   const openEdit = (product) => {
     setFormData({
         ...product,
-        imageUrls: product.imageUrls || [product.imageUrl] // Fallback for old single-image data
+        imageUrls: product.imageUrls || [product.imageUrl]
     });
     setEditingId(product._id);
     setShowModal(true);
@@ -169,7 +175,6 @@ const AdminDashboard = () => {
               {filteredProducts.map(p => (
                 <tr key={p._id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="p-6 flex items-center gap-4">
-                    {/* Display first image from array */}
                     <img src={p.imageUrls ? p.imageUrls[0] : p.imageUrl} className="w-12 h-12 object-cover rounded-xl border" alt="" />
                     <div>
                       <p className="font-black text-sm uppercase truncate max-w-[150px]">{p.name}</p>
@@ -209,6 +214,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      {/* REVIEWS SECTION REMAINS THE SAME */}
       <div className="max-w-4xl">
         <h2 className="text-2xl font-black uppercase italic mb-8 border-l-8 border-yellow-400 pl-4">Pending Reviews 🛡️</h2>
         <div className="space-y-4">
@@ -237,10 +243,8 @@ const AdminDashboard = () => {
             <div className="space-y-6">
                 <div>
                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 block">Visuals (Select Multiple)</label>
-                    {/* Added 'multiple' attribute */}
                     <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="block w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-black file:text-white" />
                     
-                    {/* Image Preview Gallery */}
                     <div className="grid grid-cols-3 gap-2 mt-4">
                         {formData.imageUrls.map((url, index) => (
                             <div key={index} className="relative group">
@@ -288,12 +292,32 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                <div className="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
-                    <select className="bg-transparent font-black uppercase text-[10px] outline-none" value={formData.category} onChange={(e)=>setFormData({...formData, category: e.target.value})}>
-                        <option value="shoes">Shoes</option>
-                        <option value="clothes">Clothes</option>
+                {/* UPDATED CATEGORY DROPDOWN */}
+                <div className="flex flex-col bg-gray-50 p-4 rounded-2xl gap-4">
+                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Select Category</label>
+                    <select 
+                      className="bg-white border p-3 rounded-xl font-black uppercase text-[12px] outline-none focus:border-black" 
+                      value={formData.category} 
+                      onChange={(e)=>setFormData({...formData, category: e.target.value})}
+                    >
+                        <optgroup label="Fashion">
+                          <option value="shoes">Shoes</option>
+                          <option value="clothes">Clothes</option>
+                        </optgroup>
+                        <optgroup label="Accessories">
+                          <option value="foam-cleaner">Foam Cleaner</option>
+                          <option value="laptop-stands">Laptop Stands</option>
+                          <option value="thermo-cups">Thermo Cups</option>
+                          <option value="sneaker-guards">Sneaker Guards</option>
+                        </optgroup>
+                        <optgroup label="Wigs">
+                          <option value="human-hair">Human Hair</option>
+                          <option value="semi-human">Semi Human Hair</option>
+                          <option value="braids">Braids</option>
+                        </optgroup>
                     </select>
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    
+                    <label className="flex items-center gap-2 cursor-pointer mt-2">
                         <input type="checkbox" className="w-4 h-4 accent-black" checked={formData.isHotPick} onChange={(e)=>setFormData({...formData, isHotPick: e.target.checked})} />
                         <span className="text-[10px] font-black uppercase tracking-tighter">Hot Pick 🔥</span>
                     </label>
@@ -301,8 +325,16 @@ const AdminDashboard = () => {
             </div>
 
             <div className="flex gap-4 mt-10">
-              <button type="submit" disabled={isUploading} className="flex-1 bg-black text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] hover:bg-yellow-400 hover:text-black transition-all">
-                {editingId ? "Update" : "Drop It"}
+              <button 
+                type="submit" 
+                disabled={isUploading || isSaving} 
+                className={`flex-1 py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center ${
+                  (isUploading || isSaving) 
+                    ? "bg-gray-400 cursor-not-allowed" 
+                    : "bg-black text-white hover:bg-yellow-400 hover:text-black"
+                }`}
+              >
+                {isSaving ? "PROCESSING..." : (editingId ? "Update" : "Drop It")}
               </button>
               <button type="button" onClick={()=>{setShowModal(false); resetForm();}} className="flex-1 bg-gray-100 py-5 rounded-2xl font-black uppercase tracking-widest">Cancel</button>
             </div>

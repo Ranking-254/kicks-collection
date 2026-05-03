@@ -8,10 +8,18 @@ const ProductCard = ({ product }) => {
   const currentPrice = Number(product.price);
   const savedAmount = (originalPrice > currentPrice) ? originalPrice - currentPrice : 0;
 
-  // 🛠️ THE FIX: Check for the first image in the array, fallback to single image, then placeholder
-  const displayImage = (product.imageUrls && product.imageUrls.length > 0) 
+  // 🛠️ THE FIX: Get image and apply Cloudinary high-res + sharpening transformation
+  let displayImage = (product.imageUrls && product.imageUrls.length > 0) 
     ? product.imageUrls[0] 
     : (product.imageUrl || 'https://via.placeholder.com/400x400?text=No+Image');
+
+  // Apply high-res, sharpening, and padding if it's a Cloudinary link
+  if (displayImage.includes('res.cloudinary.com')) {
+    displayImage = displayImage.replace(
+      '/upload/', 
+      '/upload/q_auto:best,f_auto,e_sharpen:100,c_pad,b_white/'
+    );
+  }
 
   return (
     <>
@@ -27,7 +35,6 @@ const ProductCard = ({ product }) => {
         )}
 
         <div className="relative h-64 overflow-hidden">
-          {/* ⚡ UPDATED src HERE ⚡ */}
           <img 
             src={displayImage} 
             alt={product.name} 
@@ -47,7 +54,6 @@ const ProductCard = ({ product }) => {
         </div>
       </div>
 
-      {/* THE MODAL */}
       {showDetails && (
         <ProductDetailsModal 
           product={product} 

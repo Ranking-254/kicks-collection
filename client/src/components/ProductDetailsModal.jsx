@@ -10,14 +10,18 @@ const ProductDetailsModal = ({ product, onClose }) => {
   const [reviewData, setReviewData] = useState({ user: '', rating: 5, comment: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // NEW: State to track the currently selected image in the gallery
-  // Fallback to product.imageUrl if imageUrls isn't available yet
   const [activeImg, setActiveImg] = useState(product.imageUrls?.[0] || product.imageUrl);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = 'unset'; };
   }, []);
+
+  // Helper to force high quality
+  const getHighResUrl = (url) => {
+    if (!url || !url.includes('res.cloudinary.com')) return url;
+    return url.replace('/upload/', '/upload/q_auto:best,f_auto/');
+  };
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -38,24 +42,21 @@ const ProductDetailsModal = ({ product, onClose }) => {
 
       <div className="relative bg-white w-full max-w-6xl rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[95vh] z-[10000]">
         
-        {/* LEFT: IMAGE SECTION WITH GALLERY */}
         <div className="md:w-1/2 flex flex-col bg-gray-50">
-          {/* Main Active Image */}
           <div className="h-64 md:h-[500px] overflow-hidden bg-gray-100">
             <img 
-              src={activeImg} 
+              src={getHighResUrl(activeImg)} 
               alt={product.name} 
               className="w-full h-full object-cover transition-all duration-500" 
             />
           </div>
 
-          {/* Thumbnail Gallery */}
           {product.imageUrls && product.imageUrls.length > 1 && (
             <div className="flex gap-2 p-4 overflow-x-auto justify-center bg-white border-t border-gray-100">
               {product.imageUrls.map((url, index) => (
                 <img 
                   key={index}
-                  src={url}
+                  src={getHighResUrl(url)}
                   onClick={() => setActiveImg(url)}
                   className={`w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl cursor-pointer border-2 transition-all duration-300 ${
                     activeImg === url 
@@ -69,7 +70,6 @@ const ProductDetailsModal = ({ product, onClose }) => {
           )}
         </div>
 
-        {/* RIGHT: DETAILS & REVIEWS */}
         <div className="md:w-1/2 p-8 md:p-12 flex flex-col overflow-y-auto bg-white">
           <div className="flex justify-between items-start mb-6">
             <h2 className="text-4xl font-black uppercase italic leading-none">{product.name}</h2>
@@ -78,7 +78,6 @@ const ProductDetailsModal = ({ product, onClose }) => {
 
           <p className="text-3xl font-black text-black mb-8">KES {product.price}</p>
 
-          {/* SIZE SELECTOR */}
           <div className="mb-8">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Pick Size</h4>
             <div className="flex flex-wrap gap-2">
@@ -96,12 +95,10 @@ const ProductDetailsModal = ({ product, onClose }) => {
             </div>
           </div>
 
-          {/* DESCRIPTION */}
           <div className="mb-10 p-6 bg-gray-50 rounded-3xl text-sm italic text-gray-600">
             "{product.description}"
           </div>
 
-          {/* ✍️ WRITE A REVIEW SECTION */}
           <div className="mb-10 border-t border-gray-100 pt-8">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6">Drop a Review</h4>
             <form onSubmit={handleReviewSubmit} className="space-y-4">
@@ -136,7 +133,6 @@ const ProductDetailsModal = ({ product, onClose }) => {
             </form>
           </div>
 
-          {/* DISPLAY REVIEWS */}
           <div className="mb-10">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6">Recent Feedback</h4>
             <div className="space-y-6">

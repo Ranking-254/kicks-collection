@@ -35,7 +35,17 @@ const ProductSchema = new mongoose.Schema({
     category: { 
         type: String, 
         required: true, 
-        enum: ['shoes', 'clothes'] 
+        enum: [
+            'shoes', 
+            'clothes', 
+            'foam-cleaner', 
+            'laptop-stands', 
+            'thermo-cups', 
+            'sneaker-guards', 
+            'human-hair', 
+            'semi-human', 
+            'braids'
+        ] 
     },
     isHotPick: { 
         type: Boolean, 
